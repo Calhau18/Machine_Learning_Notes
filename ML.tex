@@ -1,6 +1,6 @@
 \documentclass{article}
 \title{Machine Learning Notes}
-\date{2020}
+\date{2022}
 \author{João Rocha}
 	
 \usepackage[utf8]{inputenc}
@@ -28,6 +28,47 @@
 \begin{document}
 \maketitle
 
-\newpage
+\section{Introduction}
+
+\section{Supervised Learning}
+
+We call \textbf{Supervised Learning} to instances of learning where we are given a dataset $(X, Y) \in \R^{(m + n) \times d}$ where $X$ are some inputs and $Y$ are some outputs and each pair $(x, y)$ is an observation or an instance of our dataset. 
+The purpose of supervised learning is to learn some mapping that fits the dataset best. 
+That is, for some error function $E$, we shall learn a mapping $\hat{f}$ such that $E(\hat{f(X)}, Y)$ is minimized.
+
+\subsection{Linear Regression}
+
+For \textbf{Linear Regression} we assume that the outputs are a linear function of the inputs, and thus our function $\hat{f}$ can be written as $\hat{f}(x) = \theta x$ for some $\theta \in \R^{(m+1)}$.
+We define $\theta$ to be in $\R^{(m+1)}$ in order to allow linear functions that do not go through the origin (more precisely, afine functions).
+With that in mind, we also extend each input vector $x$ to be in $\R^{(m+1)}$ using the mapping $x \to (1, x)$.
+
+Therefore, we want to find $\hat{\theta} = \arg \min_\theta E(\theta X, Y)$, and our predictions will be of the form $\hat{f}(x) = \hat{\theta}x$.
+
+The most standard way to define $E$ is to use the \textbf{Mean Squared Error} (MSE) defined as 
+
+$$
+E(X \theta, Y) = \frac{1}{m} \|X \theta - Y\|^2 = \frac{1}{m} (X \theta - Y)^T (X \theta - Y)
+$$
+
+where we assume to be using the Euclidean norm (we explain why bellow).
+Equivalently, we can try to minimize the \textbf{Absolute Squared Error} (ASE) that is just the sum of the square differences ($\text{ASE} = m \cdot \text{MSE}$).
+
+Since, we want to minimize this value, we can just differentiate it with respect to $A$ and set it to zero.
+
+\begin{gather*}
+\nabla_\theta (E) = 0 \Leftrightarrow 
+\nabla_\theta  \left( (X \theta - Y)^T(X \theta - Y) \right) = 0 \Leftrightarrow \\
+\nabla_\theta  \left( \theta^T X^T X \theta - \theta^T X^T Y - Y^T X \theta + Y^T Y \right) = 0 \Leftrightarrow \\
+2 X^T X \theta - 2 X^T Y = 0 \Leftrightarrow 
+\theta = (X^T X)^{-1} X^T Y
+\end{gather*}
+
+Note that $X^T X$ is a symmetric matrix, and thus it is invertible if and only if it is positive definite.
+This means that we can only use this method if the number of features $m$ is smaller than the number of instances $n$.
+
+The Euclidean norm is the most commonly used norm for measurements in $\R^d$, but that is not why we use it in this instance.
+In fact, the Euclidean norm is in some aspects less desirable than other norms (for example, it is very unreliable in outlier detection).
+However, it arises naturally by assuming that the errors are normally distributed.
+In fact, if we assume that the random variable $X \theta - Y$ is normally distributed with mean zero and variance $\sigma^2$, then the \textbf{Maximum Likelihood Estimation} for $\theta$ is the one that minimizes the MSE.
 
 \end{document}
