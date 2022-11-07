@@ -71,4 +71,46 @@ In fact, the Euclidean norm is in some aspects less desirable than other norms (
 However, it arises naturally by assuming that the errors are normally distributed.
 In fact, if we assume that the random variable $X \theta - Y$ is normally distributed with mean zero and variance $\sigma^2$, then the \textbf{Maximum Likelihood Estimation} for $\theta$ is the one that minimizes the MSE.
 
+This predictions algorithm has the downside that only works with data that depends linearly on the inputs.
+
+This approach to linear regression has a complexity of $O(dm^2 + m^3)$ to compute $\theta$, but predicts new values in $O(m)$ time.
+
+\subsubsection{Nonlinear Regression}
+
+Assume our dataset does not fit well to any linear function of the inputs. 
+One way to deal with this is to use a nonlinear function of the inputs.
+We can think of this as transforming our inputs in $\R^m$ to $\R^k$ through a function $\phi: \R^m \to \R^k$ ($k > m$) and then using linear regression on the new inputs.
+This allows us to fit our data to any function in the span of $\phi$.
+
+In this case, $\theta$ is given by
+$$
+\theta = (\Phi(X)^T \Phi(X))^{-1} \Phi(X)^T Y
+$$
+where $\Phi(X)$ is the matrix with the $\phi(x_i)$ as rows.
+Just like before, we predict according to the function $\hat{f}(x) = \theta^T \phi(x)$.
+
+It is worth noting that our default assumption that $x_0 = 1$ for every vector can be viewed as a particular case of a mapping - $\phi(x) = (1, x)$.
+
+This approach has the problem that it might not be obvious what kind of function our dataset follows.
+
+It computes $\theta$ in $O(f(d,m,k) + dk^2 + k^3)$ time (where $f(d,m,k)$ is the time needed to compute $\Phi$), predicting in $O(k)$ time.
+
+\subsubsection{Locally Weighted Linear Regression}
+
+If the outputs are a continuous function of the inputs, we can always fit a linear function locally to the data at any given point.
+We can achieve this by using a weighted linear regression, where the weights are given by a function $w: \R^m \to \R$ that is high for points close to the point we are predicting and low for points far away.
+The most commonly used function to assign weights is therefore $w(x) = \exp(-\frac{||x - x_i||^2}{2\tau^2})$ for some $\tau > 0$ ($x_i$ is the point we want to predict).
+Therefore, in locally weighted regression, instead of minimizing $||X \theta - Y||^2$, we minimize $||W^{\frac{1}{2}}(X \theta - Y)||^2$ where $W$ is a diagonal matrix with the weights on the diagonal.
+A prediction in this case is given by
+$$
+\hat{f}(x) = \theta^T x = ((X^T W X)^{-1} X^T W^{\frac{1}{2}} Y)^T x
+$$
+
+This approach, while working almost always, is very slow, since it needs to compute the weights for every point in the dataset.
+It takes the same $O(dm^2 + m^3)$ time to compute $\theta$ as the above methods, but needs to compute a different $\theta$ for every prediction.
+
+\subsection{Gradient Descent}
+
+\subsection{Logistic Regression}
+
 \end{document}
