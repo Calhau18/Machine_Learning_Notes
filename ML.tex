@@ -353,4 +353,64 @@ To chooose where this slice should be done, we need to define a cost function th
 
 \section{Unsupervised Learning}
 
+We say we are in an \textbf{unsupervised learning} setting if we are given a dataset $X$ and we want to gather some information of any form about that data.
+
+\subsection{Clustering}
+
+One of the most common types of unsupervised learning is \textbf{clustering}, where we want to group together the data points in $X$ into clusters.
+We define clusters as being subsets of $X$ such that the intradistances are small and the interdistances are large.
+
+\subsubsection{K-Means}
+
+One of the most common algorithm for clustering is \textbf{K-Means}, which works as follows:
+\begin{enumerate}
+\item Choose $k$ random points in $X$ as the initial centroids $\mu_1, \cdots, \mu_k$.
+\item Repeat until convergence
+\begin{enumerate}
+\item For each point $x \in X$, set $c^{(i)} = \arg\min_{j} ||x-\mu_j||^2$.
+\item For each cluster $j$, set $\mu_j = \frac{1}{|C_j|} \sum_{x \in C_j} x$.
+\end{enumerate}
+\end{enumerate}
+
+\subsubsection{Expectation Maximization (EM)}
+
+= GDA mas sem observar a random variable Y
+
+For the \textbf{Expectation Maximization} algorithm, we assume that there is a random variable $Z$ that is unobservable, such that $Z \sim multinoulli(\phi)$ for some $\phi = (\phi_1, \cdots, \phi_k)$ such that $\sum_{i=1}^k \phi_i = 1$ and 
+$$
+X \mid Z = j \sim N(\mu_j, \Sigma_j)
+$$
+
+The EM algorithm aims to find the maximum likelihood estimate of the parameters $\phi, \mu_1, \cdots, \mu_k, \Sigma_1, \cdots, \Sigma_k$.
+
+The algorithm has to steps:
+\begin{enumerate}
+\item \textbf{E-step}: compute the posterior distribution of $Z$ given the current parameters:
+\begin{gather*}
+P(Z = j | X ; \phi, \mu, \Sigma) =
+\frac{P(X | Z = j ; \mu, \Sigma) P(Z = j ; \phi)}{\sum_{j=1}^k P(X | Z = j ; \mu, \Sigma) P(Z = j ; \phi)} = 
+\frac{\phi_j \mathcal{N}(X ; \mu_j, \Sigma_j)}{\sum_{j=1}^k \phi_j \mathcal{N}(X ; \mu_j, \Sigma_j)}
+\end{gather*}
+\item \textbf{M-step}: compute the maximum likelihood estimate of the parameters given the current posterior distribution of $Z$:
+\begin{gather*}
+\phi_j = \frac{1}{N} \sum_{i=1}^N P(Z = j | X ; \phi, \mu, \Sigma) \\
+\mu_j = \frac{\sum_{i=1}^N P(Z = j | X ; \phi, \mu, \Sigma) X_i}{\sum_{i=1}^N P(Z = j | X ; \phi, \mu, \Sigma)} \\
+\Sigma_j = \frac{\sum_{i=1}^N P(Z = j | X ; \phi, \mu, \Sigma) (X_i - \mu_j)(X_i - \mu_j)^T}{\sum_{i=1}^N P(Z = j | X ; \phi, \mu, \Sigma)}
+\end{gather*}
+
+The algorithm is derived by:
+\begin{itemize}
+\item \textbf{E-step}: Using Jensen's inequality* to obtain a lower bound on the log-likelihood function of the parameters, such that this function and the estimation coincide at the current value of the parameters.
+\item \textbf{M-step}: Computing a MLE of the parameters on that lower bound.
+\end{itemize}
+
+It is easy to see that iterations of these two steps will converge too a local maximum of the log-likelihood function.
+
+*we use a trick to make the inequality work: we multiply and divide by the probability density function of some distribution $Q_i$ evaluated at one of the classes $z$ from $Z$, and use that to get an expected value in the formula.
+We then use the fact that we want our estimation and the log-likelihood function to be equal at the current value of our parameter to conclude that this distribution shall be $Z | X ; \theta$ where $\theta$ are our parameters.
+
+\end{enumerate}
+
+\subsection{Dimensionality Reduction}
+
 \end{document}
