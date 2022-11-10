@@ -36,9 +36,7 @@ We call \textbf{Supervised Learning} to instances of learning where we are given
 The purpose of supervised learning is to learn some mapping that fits the dataset best. 
 That is, for some error function $E$, we shall learn a mapping $\hat{f}$ such that $E(\hat{f(X)}, Y)$ is minimized.
 
-\subsection{Regression}
-
-\subsubsection{Linear Regression}
+\subsection{Linear Regression}
 
 For \textbf{Linear Regression} we assume that the outputs are a linear function of the inputs, and thus our function $\hat{f}$ can be written as $\hat{f}(x) = \theta x$ for some $\theta \in \R^{(m+1)}$.
 We define $\theta$ to be in $\R^{(m+1)}$ in order to allow linear functions that do not go through the origin (more precisely, afine functions).
@@ -111,9 +109,7 @@ $$
 This approach, while working almost always, is very slow, since it needs to compute the weights for every point in the dataset.
 It takes the same $O(dm^2 + m^3)$ time to compute $\theta$ as the above methods, but needs to compute a different $\theta$ for every prediction.
 
-\subsection{Classification}
-
-\subsubsection{Logistic Regression}
+\subsection{Logistic Regression}
 
 \textbf{Logistic Regression} is an algorithm used for binary classifications. 
 Instead of finding an hyperplane that best fits a real-valued output, we find a hyperplane that best separates positive and negatives observations.
@@ -132,12 +128,6 @@ In fact, the function is strictly convex, which guarantees the existance of an u
 
 We can't not mention the \textbf{Sigmoid Function} $\sigma(z) = \frac{1}{1 + \exp(-z)}$.
 The usual choice for the function $h_\theta(x) = \sigma(\theta^T x)$ as determined by the Theory of Generalized Linear Models, which we will touch bellow.
-
-\subsubsection{Naive Bayes}
-
-\subsubsection{k Nearest Neighbours}
-
-\subsubsection{Decision Trees}
 
 \subsection{Convex Optimization}
 
@@ -198,6 +188,164 @@ Therefore, the overall complexity is $O(m^2(m+d)s)$.
 May it be the case that we cannot be sure of an initial point under which the convergence conditions are met, we might want to use Gradient Descent until this is the case.
 
 \subsection{Generalized Linear Models}
+
+\subsection{Perceptron}
+
+The \textbf{perceptron} algorithm is a simple algorithm for binary classification that tries to find a linear function of the inputs that separates the positive and negative outputs.
+It classifies every input $x$ with the function $sgn(w^T x)$ for a parameter $w \in \R^n$.
+The sign function is called the \textbf{activation function}.
+This parameter is found by the \textbf{perceptron learning rule}:
+\begin{enumerate}
+\item Choose a starting point $w_0 \in \R^n$.
+\item Choose a learning rate $\eta \in ]0,1[$.
+\item Repeat until convergence:
+\begin{enumerate}
+\item Choose an observation $(x_i, y_i)$ from the dataset
+\item Compute $\Delta w = \eta (y_i - o_i) x_i$, where $o_i = sgn(w^T x_i)$.
+\item Update the weights $w = w + \Delta w$.
+\end{enumerate}
+\end{enumerate}
+
+The algorithm is guaranteed to converge to a solution if the data is linearly separable and $\eta$ is sufficiently small.
+
+Note the similarity between the perceptron algorithm and logistic regression - the only difference between the two is in the so called \textbf{activation function}: the perceptron uses the $sgn$ function, while logistic regression uses the sigmoid function.
+Furthermore, it is worth noting that since the derivative of the sign function is 0 at every point (except 0, where it is not defined), we cannot use gradient descent to "teach" a perceptron, creating the need for a specific learning algorithm.
+
+\subsection{Neural Networks}
+
+A \textbf{Neural Network} can be described as a set of \textbf{nodes}, organized in layers such that each node stores a value $y \in \R$, that depends on the nodes of the previous layers $x \in \R^n$ as $y = f(w^T x + b)$ for a parameter $w \in \R^n$ and some activation function $f: \R \to \R$.
+Neural networks have a lot of values and variables so it is important to state the notation clearly:
+\begin{itemize}
+\item $L$ is the number of layers in the network, including the \textbf{input} layer (first layer) and the \textbf{output} layer (last layer). The remaining layers can be refered to as \textbf{hidden layers}.
+\item We use $n^{[l]}$ to denote the number of nodes in layer $l$.
+\item We denote the values on the nodes of the $l$-th layer as $x^{[l]} \in \R^{n^{[l]}}$. $x^{[1]}$ is the input $x$ and $x^{[L]}$ is the output $z$. 
+\item As we've stated, we have $x^{[l]}_i = f(w^T x^{[l-1]} + b)$ for $i = 1, \dots, n^{[l]}$ and some weight parameter $w \in \R^{n^{[l]}}$ and some bias $b \in \R$. We use $w^{[l-1]}_i$ and $b^{[l-1]}_i$ to refer to the weights and bias used at the node $x^{[l]}_i$. Therefore, $x^{[l]}_i = f({w^{[l-1]}_i}^T x^{[l-1]} + b^{[l-1]}_i)$. 
+\item We usually combine these weights in a weight matrix $W^{[l]} \in \R^{n^{[l+1]} \times n^{[l]}}$ such that the row $i$ of $W$ is ${w^{[l]}_i}^T$. We also combine the biases in a column vector $b \in \R^{n^{[l]}} = [b^{[l+1]}_i]_{i=1}^{n^{[l]}}$. We can then say that $x^{[l]} = f(W^{[l-1]}x^{[l-1]} + b^{[l-1]})$ (we extend the application function to be applied elementwise to a vector).
+\item It is useful to define $z^{[l]} = W^{[l-1]}x^{[l-1]} + b^{[l-1]}$. Therefore, $x^{[l]} = f(z^{[l]})$.
+\end{itemize}
+
+The prediction process of a neural network, given an input $x$ is then as follows:
+\begin{enumerate}
+\item Set $x^{[1]} = x$.
+\item For $l = 2, \dots, L$:
+\begin{enumerate}
+\item Compute $z^{[l]} = W^{[l-1]}x^{[l-1]} + b^{[l-1]}$.
+\item Compute $x^{[l]} = f(z^{[l]})$.
+\end{enumerate}
+\item Return $x^{[L]}$.
+\end{enumerate}
+
+This process is often called \textbf{Forward Propragation}, as the input is propagated forward through the network.
+
+We note that all the weight matrices and bias vectors parametrize the neural network.
+These are the values that we want to learn from the data.
+We can see that the number of parameters is
+$$
+\sum_{l=1}^{L-1} n^{[l+1]} n^{[l]} + \sum_{l=1}^{L-1} n^{[l]}
+$$
+assuming that the input vector is of size $n$, the output vector is of size $m$, and each hidden layer is of size in the same order of magnitude (lets say approx. $d$), we conclude that we want to learn $O(nd + Ld^2 + md)$ parameters.
+
+The only thing remaining is then to find a way to learn these parameters.
+We can do this by using the \textbf{Backpropagation} algorithm, which is essentially a form of gradient descent.
+We will update each parameter as follows:
+\begin{gather*}
+W^{[l]} \leftarrow W^{[l]} - \eta \frac{\partial L}{\partial W^{[l]}} \\
+b^{[l]} \leftarrow b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
+\end{gather*}
+where $\eta$ is the learning rate.
+
+We see that, for the last layer
+\begin{gather*}
+\frac{\partial L}{\partial W^{[L-1]}} = \frac{\partial L}{\partial x^{[L]}} \frac{\partial x^{[L]}}{\partial z^{[L]}} \frac{\partial z^{[L]}}{\partial W^{[L-1]}} \\
+\frac{\partial L}{\partial b^{[L-1]}} = \frac{\partial L}{\partial x^{[L]}} \frac{\partial x^{[L]}}{\partial z^{[L]}} \frac{\partial z^{[L]}}{\partial b^{[L-1]}}
+\end{gather*}
+
+and for any other layer
+\begin{gather*}
+\frac{\partial L}{\partial W^{[l-1]}} = \frac{\partial L}{\partial x^{[l]}} \frac{\partial x^{[l]}}{\partial z^{[l]}} \frac{\partial z^{[l]}}{\partial x^{[l-1]}} \frac{\partial x^{[l-1]}}{\partial z^{[l-1]}} \frac{\partial z^{[l-1]}}{\partial W^{[l-1]}} \\
+\frac{\partial L}{\partial b^{[l-1]}} = \frac{\partial L}{\partial x^{[l]}} \frac{\partial x^{[l]}}{\partial z^{[l]}} \frac{\partial z^{[l]}}{\partial x^{[l-1]}} \frac{\partial x^{[l-1]}}{\partial z^{[l-1]}} \frac{\partial z^{[l-1]}}{\partial b^{[l-1]}}
+\end{gather*}
+
+and we can easily compute
+
+\begin{gather*}
+\frac{\partial x^{[l]}}{\partial z^{[l]}} = f'(z^{[l]}) \quad
+\frac{\partial z^{[l]}}{\partial W^{[l-1]}} = x^{[l-1]} \quad
+\frac{\partial z^{[l]}}{\partial b^{[l-1]}} = 1 \quad
+\frac{\partial z^{[l]}}{\partial x^{[l-1]}} = W^{[l-1]}
+\end{gather*}
+
+We note that the first two terms of the above equations are computed before we reach the corresponding layer. 
+Therefore we can reuse these values.
+Defining $\delta^{[l]} = \frac{\partial L}{\partial x^{[l]}} \frac{\partial x^{[l]}}{\partial z^{[l]}}$ we can write the above equations as
+
+\begin{gather*}
+\frac{\partial L}{\partial W^{[l-1]}} = \delta^{[l]} x^{[l-1]} \\
+\frac{\partial L}{\partial b^{[l-1]}} = \delta^{[l]} \\
+\delta^{[l-1]} = \delta^{[l]} W^{[l-1]} f'(z^{[l]})
+\end{gather*}
+
+Therefore, we can now describe the backpropagation algorithm as follows:
+\begin{enumerate}
+\item Set $x^{[1]} = x$.
+\item Forward progragate the input through the network, computing $z^{[l]}$ and $x^{[l]}$ for each layer.
+\item Compute $\delta^{[L]} = \frac{\partial L}{\partial x^{[L]}} \frac{\partial x^{[L]}}{\partial z^{[L]}} = \frac{\partial L}{\partial x^{[L]}} f'(z^{[L]})$.
+\item For $l = L-1, \dots, 1$:
+\begin{enumerate}
+\item Compute $\frac{\partial L}{\partial W^{[l]}} = \delta^{[l+1]} x^{[l]}$.
+\item Compute $\frac{\partial L}{\partial b^{[l]}} = \delta^{[l+1]}$.
+\item Update the parameters as follows:
+\begin{gather*}
+W^{[l]} \leftarrow W^{[l]} - \eta \frac{\partial L}{\partial W^{[l]}} \\
+b^{[l]} \leftarrow b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
+\end{gather*}
+\item Compute $\delta^{[l-1]} = \delta^{[l]} W^{[l-1]} f'(z^{[l-1]})$.
+\end{enumerate}
+\end{enumerate}
+
+So far we have abstracted away the details of the activation function $f$ and the loss function $L$.
+These will depend on the problem at hand:
+\begin{itemize}
+\item For binary classification problems, the most common choices are by far the cross-entropy loss function $L(w) = y \log(z) + (1-y) \log(1-z)$ and the logistic activation function $\sigma(z) = \frac{1}{1+e^{-z}}$.
+\item For regression problems, the most common choices are the mean squared error loss function $L(w) = \frac{1}{2} (y-z)^2$ and the \textbf{Rectified Linear Unit} activation function $f(z) = \max(0,z)$.
+\end{itemize}
+
+We will repeat the algorithm, now specifying the logistic activation function and the sum of squares loss function.
+\begin{enumerate}
+\item Set $x^{[1]} = x$.
+\item Forward progragate the input through the network, computing $z^{[l]}$ and $x^{[l]}$ for each layer.
+\item Compute $\delta^{[L]} = \frac{\partial L}{\partial x^{[L]}} \frac{\partial x^{[L]}}{\partial z^{[L]}} = \frac{\partial L}{\partial x^{[L]}} f'(z^{[L]}) = (z-y) f'(z^{[L]}) = (z-y) \sigma(z^{[L]})(1-\sigma(z^{[L]}))$.
+\item For $l = L-1, \dots, 1$:
+\begin{enumerate}
+\item Compute $\frac{\partial L}{\partial W^{[l]}} = \delta^{[l+1]} x^{[l]}$.
+\item Compute $\frac{\partial L}{\partial b^{[l]}} = \delta^{[l+1]}$.
+\item Update the parameters as follows:
+\begin{gather*}
+W^{[l]} \leftarrow W^{[l]} - \eta \frac{\partial L}{\partial W^{[l]}} \\
+b^{[l]} \leftarrow b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
+\end{gather*}
+\item Compute $\delta^{[l-1]} = \delta^{[l]} W^{[l-1]} \sigma(z^{[L]})(1-\sigma(z^{[L]}))$.
+\end{enumerate}
+\end{enumerate}
+
+\subsection{Naive Bayes}
+
+\subsection{k Nearest Neighbours}
+
+\subsection{Decision Trees}
+
+Some classification problems are best modeled by a complex combination of predicates.
+\textbf{Decision Trees} work well in cases where differentiating the classes can be done (or approximated well enough) by asking a series of questions.
+
+A \textbf{Decision Tree} is a tree where each node splits the domain into sections according to a certain predicate on one of the features.
+At every leave, we end up with a subset of the domain, and we can assign a class to that subset.
+This is done by just taking the mode of the classes in that subset.
+
+The obvious question that poses itself is how to select the feature at each node, and which predicate to evaluate to create the children of the current node.
+
+We start by defining how to choose the predicate.
+Normally, the predicate used is just a threshold on the value of the feature, which can be viewed as slicing the domain space at the current node in two, through an hyperplane orthogonal to the axis of the current feature.
+To chooose where this slice should be done, we need to define a cost function that measures how good a split is.
 
 \section{Evaluating Models}
 
