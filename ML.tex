@@ -218,7 +218,7 @@ Neural networks have a lot of values and variables so it is important to state t
 \begin{itemize}
 \item $L$ is the number of layers in the network, including the \textbf{input} layer (first layer) and the \textbf{output} layer (last layer). The remaining layers can be refered to as \textbf{hidden layers}.
 \item We use $n^{[l]}$ to denote the number of nodes in layer $l$.
-\item We denote the values on the nodes of the $l$-th layer as $x^{[l]} \in \R^{n^{[l]}}$. $x^{[1]}$ is the input $x$ and $x^{[L]}$ is the output $z$. 
+\item We denote the values on the nodes of the $l$-th layer as $x^{[l]} \in \R^{n^{[l]}}$. $x^{[1]}$ is the input $x$ and $x^{[L]}$ is the output $\hat{y}$. 
 \item As we've stated, we have $x^{[l]}_i = f(w^T x^{[l-1]} + b)$ for $i = 1, \dots, n^{[l]}$ and some weight parameter $w \in \R^{n^{[l]}}$ and some bias $b \in \R$. We use $w^{[l-1]}_i$ and $b^{[l-1]}_i$ to refer to the weights and bias used at the node $x^{[l]}_i$. Therefore, $x^{[l]}_i = f({w^{[l-1]}_i}^T x^{[l-1]} + b^{[l-1]}_i)$. 
 \item We usually combine these weights in a weight matrix $W^{[l]} \in \R^{n^{[l+1]} \times n^{[l]}}$ such that the row $i$ of $W$ is ${w^{[l]}_i}^T$. We also combine the biases in a column vector $b \in \R^{n^{[l]}} = [b^{[l+1]}_i]_{i=1}^{n^{[l]}}$. We can then say that $x^{[l]} = f(W^{[l-1]}x^{[l-1]} + b^{[l-1]})$ (we extend the application function to be applied elementwise to a vector).
 \item It is useful to define $z^{[l]} = W^{[l-1]}x^{[l-1]} + b^{[l-1]}$. Therefore, $x^{[l]} = f(z^{[l]})$.
@@ -232,7 +232,7 @@ The prediction process of a neural network, given an input $x$ is then as follow
 \item Compute $z^{[l]} = W^{[l-1]}x^{[l-1]} + b^{[l-1]}$.
 \item Compute $x^{[l]} = f(z^{[l]})$.
 \end{enumerate}
-\item Return $x^{[L]}$.
+\item Return $\hat{y} = x^{[L]}$.
 \end{enumerate}
 
 This process is often called \textbf{Forward Propragation}, as the input is propagated forward through the network.
@@ -306,15 +306,15 @@ b^{[l]} \leftarrow b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
 So far we have abstracted away the details of the activation function $f$ and the loss function $L$.
 These will depend on the problem at hand:
 \begin{itemize}
-\item For binary classification problems, the most common choices are by far the cross-entropy loss function $L(w) = y \log(z) + (1-y) \log(1-z)$ and the logistic activation function $\sigma(z) = \frac{1}{1+e^{-z}}$.
-\item For regression problems, the most common choices are the mean squared error loss function $L(w) = \frac{1}{2} (y-z)^2$ and the \textbf{Rectified Linear Unit} activation function $f(z) = \max(0,z)$.
+\item For binary classification problems, the most common choices are by far the cross-entropy loss function $L(w) = y \log(\hat{y}) + (1-y) \log(1-\hat{y})$ and the logistic activation function $\sigma(z) = \frac{1}{1+e^{-z}}$.
+\item For regression problems, the most common choices are the mean squared error loss function $L(w) = \frac{1}{2} (y-\hat{y})^2$ and the \textbf{Rectified Linear Unit} activation function $RELU(z) = \max(0,z)$.
 \end{itemize}
 
 We will repeat the algorithm, now specifying the logistic activation function and the sum of squares loss function.
 \begin{enumerate}
 \item Set $x^{[1]} = x$.
 \item Forward progragate the input through the network, computing $z^{[l]}$ and $x^{[l]}$ for each layer.
-\item Compute $\delta^{[L]} = \frac{\partial L}{\partial x^{[L]}} \frac{\partial x^{[L]}}{\partial z^{[L]}} = \frac{\partial L}{\partial x^{[L]}} f'(z^{[L]}) = (z-y) f'(z^{[L]}) = (z-y) \sigma(z^{[L]})(1-\sigma(z^{[L]}))$.
+\item Compute $\delta^{[L]} = \frac{\partial L}{\partial x^{[L]}} \frac{\partial x^{[L]}}{\partial z^{[L]}} = \frac{\partial L}{\partial x^{[L]}} f'(z^{[L]}) = (\hat{y}-y) f'(z^{[L]}) = (\hat{y}-y) \hat{y}(1-\hat{y})$.
 \item For $l = L-1, \dots, 1$:
 \begin{enumerate}
 \item Compute $\frac{\partial L}{\partial W^{[l]}} = \delta^{[l+1]} x^{[l]}$.
@@ -324,9 +324,11 @@ We will repeat the algorithm, now specifying the logistic activation function an
 W^{[l]} \leftarrow W^{[l]} - \eta \frac{\partial L}{\partial W^{[l]}} \\
 b^{[l]} \leftarrow b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
 \end{gather*}
-\item Compute $\delta^{[l-1]} = \delta^{[l]} W^{[l-1]} \sigma(z^{[L]})(1-\sigma(z^{[L]}))$.
+\item Compute $\delta^{[l-1]} = \delta^{[l]} W^{[l-1]} \sigma(z^{[l]})(1-\sigma(z^{[l]})) = \delta^{[l]}W^{l-1]}x^{[l]}(1-x^{[l]})$.
 \end{enumerate}
 \end{enumerate}
+
+(we used the fact that $\sigma'(z) = \sigma(z)(1-\sigma(z))$).
 
 \subsection{Naive Bayes}
 
