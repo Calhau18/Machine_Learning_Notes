@@ -355,6 +355,30 @@ However, it has been absorved that Naive Bayes performs well in practice, even w
 
 \subsection{k Nearest Neighbours}
 
+The \textbf{k Nearest Neighbours} algorithm is a very simple algorithm that simply considers the outputs of the $k$ nearest datapoints to determine the prediction for a new datapoint.
+This of course implies that a metric must be defined to measure distances between points.
+Common choices are:
+\begin{itemize}
+\item Euclidean distance: $l_2 = \sqrt{\sum_{i=1}^k (x_i-y_i)^2}$.
+\item Manhattan distance: $l_1 = \sum_{i=1}^k |x_i-y_i|$.
+\item Minkowski distance: $l_p = \left(\sum_{i=1}^k |x_i-y_i|^p\right)^{1/p}$.
+\item Cosine distance: $1-\frac{x \cdot y}{\|x\| \|y\|}$.
+\item Hamming distance: $\sum_{i=1}^k \mathbb{I}(x_i \neq y_i)$ (for categorical features).
+\end{itemize}
+
+It is important to note that the different features might be on very different scales, thus attributing very different relevance to the distances in those axis.
+Therefore it is usually important to \textbf{normalize} the vectors before computing the distances.
+
+The kNN predictor therefore works as follows:
+\begin{enumerate}
+\item Gather the $k$ nearest neighbours;
+\item Compute an estimator for the output using the neighbours:
+\begin{itemize}
+\item For regression problems, mean or median are common choices;
+\item For classification problems, majority vote or weighted majority vote are common choices.
+\end{itemize}
+\end{enumerate}
+
 \subsection{Decision Trees}
 
 Some classification problems are best modeled by a complex combination of predicates.
