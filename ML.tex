@@ -332,6 +332,27 @@ b^{[l]} \leftarrow b^{[l]} - \eta \frac{\partial L}{\partial b^{[l]}}
 
 \subsection{Naive Bayes}
 
+We can use \textbf{Bayes Theorem} to find the most probable hypothesis $\hat{H}$ given some data $D$.
+\begin{gather*}
+\hat{H} = \arg \max_{H} P(H \mid D) = \arg \max_{H} \frac{P(D \mid H)P(H)}{P(D)} = \arg \max_{H} P(D \mid H)P(H) = \\
+= \arg \max_{H} \prod_{d \in D} P(d \mid H)P(H) = \arg \max_{H} \prod_{d \in D} P(d_1, \cdots, d_k \mid H)P(H)
+\end{gather*}
+We say that $\hat{H}$ is the \textbf{Maximum A Posteriori} (MAP) hypothesis, i.e, it is the most likely hypothesis after we observe the data.
+
+If the data is multifeatured, evaluating $P(d \mid H)$ for some observation $d$ might be complicated.
+If we are only given information about each feature $d_i$ individually, we can only compute their probabilities independently.
+However, in general, the features have some correlation, causing this calculation to be tougher.
+
+On a \textbf{Naive Bayes} classifier we assume that the features are independent, thus simplifying significantly the calculations.
+In this case, for an observation $d$, we have
+\begin{gather*}
+P(d \mid H) = \prod_{i=1}^k P(d_i \mid H)
+\end{gather*}
+and we can get the probabilities inside the product by refering to the distribution of each feature.
+
+Note that this assumption is very often a bad assumption.
+However, it has been absorved that Naive Bayes performs well in practice, even when the features are not independent.
+
 \subsection{k Nearest Neighbours}
 
 \subsection{Decision Trees}
