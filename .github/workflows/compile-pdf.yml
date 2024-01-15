@@ -1,0 +1,57 @@
+name: Compile and publish PDF
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  compile:
+    name: Compile PDF
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: LaTeX Compilation
+      uses: dante-ev/latex-action@6c987f650d3d93db78994517ca18377fc494ae25 # 2023-A
+      with:
+        root_file: ML.tex
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+      with:
+        name: compiled-pdf
+        path: ML.pdf
+        retention-days: 1
+
+  release:
+    name: Publish PDF
+    needs:
+      - compile
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+    - name: Retrieve PDF
+      uses: actions/download-artifact@f44cd7b40bfd40b6aa1cc1b9b5b7bf03d3c67110 # v4.1.0
+      with:
+        name: compiled-pdf
+        path: artifact
+
+    - name: Move PDF
+      run: |
+        cp artifact/ML.pdf .
+
+    - name: GitHub Release
+      run: |
+        git tag -d compiled-pdf || true
+        git push origin --delete compiled-pdf || true
+        git tag compiled-pdf
+        git push origin compiled-pdf
+        gh release delete ${{ env.VERSION }} -y || true
+        gh release create ${{ env.VERSION }} -t "Compiled PDF" -n "Compiled PDF of this LaTeX project (commit ${{ github.sha }})" ${{ env.FILES }}
+      env:
+        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        VERSION: 'compiled-pdf'
+        FILES: ML.pdf
