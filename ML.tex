@@ -1604,11 +1604,11 @@ Note how increasing the variance means preserving the most information (think di
 More formally we want to project a set of datapoints $X = (x_1, \cdots, x_N)$ (which we'll assume are normalized) onto a linear space $L = L(u_1, \cdots, u_K)$.
 
 Let's consider first $L = L(u)$. 
-In this case, we want $\max_u \sum_{n=1}^N ||u^T x_n||^2 = \max_u u^T \Sigma u$ where $\Sigma = \frac{1}{N} \sum_{n=1}^N x_n x_n^T$ is the data covariance matrix.
+In this case, we want $\max_u \sum_{n=1}^N ||u^T x_n||^2 = \max_u u^T \Sigma u$ where $\Sigma = \frac{1}{N} \sum_{n=1}^N x_n x_n^T = \frac{1}{N} X X^T$ is the data covariance matrix.
 Imposing a normalization condition to prevent that $||u|| \to \infty$, we get that to maximize the above value $u$ corresponds to the eigenvector with the largest eigenvalue $\lambda_1$ for $\Sigma$.
 
 Note that we can now apply the same reasoning to the orthogonal projection of $L$ to extract the most information from that that was not captured by $L$.
-Thus, the PCA algorithm works essentially by finding the $K$ eigenvectors of the covariance matrix $\Sigma$ with largest eigenvalue.
+Thus, the PCA algorithm works essentially by finding the $K$ eigenvectors of the covariance matrix $\Sigma = \frac{1}{N} X X^T$ with largest eigenvalue.
 
 Note that the computational cost of computing the full eigenvector decomposition for a matrix of size $D \times D$ is $O(D^3)$.
 If we plan to project our data onto the first $K$ principal components, then we only need $O(M D^2)$.
